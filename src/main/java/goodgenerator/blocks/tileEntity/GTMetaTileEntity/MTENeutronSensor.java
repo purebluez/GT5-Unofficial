@@ -9,6 +9,16 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.StatCollector;
 import net.minecraftforge.common.util.ForgeDirection;
 
+import com.cleanroommc.modularui.api.drawable.IKey;
+import com.cleanroommc.modularui.drawable.GuiTextures;
+import com.cleanroommc.modularui.factory.PosGuiData;
+import com.cleanroommc.modularui.screen.ModularPanel;
+import com.cleanroommc.modularui.value.sync.BooleanSyncValue;
+import com.cleanroommc.modularui.value.sync.IntSyncValue;
+import com.cleanroommc.modularui.value.sync.PanelSyncManager;
+import com.cleanroommc.modularui.value.sync.StringSyncValue;
+import com.cleanroommc.modularui.widgets.ToggleButton;
+import com.cleanroommc.modularui.widgets.textfield.TextFieldWidget;
 import com.gtnewhorizons.modularui.api.math.Alignment;
 import com.gtnewhorizons.modularui.api.math.Color;
 import com.gtnewhorizons.modularui.api.screen.ModularWindow;
@@ -24,6 +34,8 @@ import gregtech.api.interfaces.ITexture;
 import gregtech.api.interfaces.metatileentity.IMetaTileEntity;
 import gregtech.api.interfaces.tileentity.IGregTechTileEntity;
 import gregtech.api.metatileentity.implementations.MTEHatch;
+import gregtech.api.modularui2.GTGuiTextures;
+import gregtech.api.modularui2.GTGuis;
 import gregtech.api.render.TextureFactory;
 import gregtech.api.util.GTUtility;
 import gregtech.common.gui.modularui.widget.CoverCycleButtonWidget;
@@ -226,6 +238,46 @@ public class MTENeutronSensor extends MTEHatch {
     public boolean allowPutStack(IGregTechTileEntity aBaseMetaTileEntity, int aIndex, ForgeDirection side,
         ItemStack aStack) {
         return false;
+    }
+
+    @Override
+    protected boolean useMui2() {
+        return true;
+    }
+
+    @Override
+    public ModularPanel buildUI(PosGuiData data, PanelSyncManager syncManager) {
+        final IKey INVERTED = IKey.lang("gui.NeutronSensor.5");
+        final IKey NORMAL = IKey.lang("gui.NeutronSensor.6");
+        IntSyncValue thresholdSyncer = new IntSyncValue(() -> threshold, val -> threshold = val);
+        syncManager.syncValue("threshold", thresholdSyncer);
+        return GTGuis.mteTemplatePanelBuilder(this, data, syncManager)
+            .build()
+            .child(
+                new ToggleButton().value(new BooleanSyncValue(() -> inverted, val -> inverted = val))
+                    .selectedBackground(GuiTextures.BUTTON_CLEAN)
+                    .overlay(false, GTGuiTextures.OVERLAY_BUTTON_REDSTONE_OFF)
+                    .overlay(true, GTGuiTextures.OVERLAY_BUTTON_REDSTONE_ON)
+                    .tooltip(false, tooltip -> tooltip.add(INVERTED))
+                    .tooltip(true, tooltip -> tooltip.add(NORMAL))
+                    .pos(10, 8))
+            .child(
+                IKey.dynamic(() -> inverted ? INVERTED.toString() : NORMAL.toString())
+                    .asWidget()
+                    .size(50, 8)
+                    .pos(30, 13))
+            .child(
+                // TODO replace this with whatever replacement comes for NumericWidget
+                new TextFieldWidget().setNumbers(0, 1200000000)
+                    .value(new StringSyncValue(thresholdSyncer::getStringValue, thresholdSyncer::setStringValue))
+                    .setFocusOnGuiOpen(true)
+                    .pos(10, 28)
+                    .size(77, 12))
+            .child(
+                IKey.lang("gui.NeutronSensor.4")
+                    .asWidget()
+                    .pos(90, 32))
+            .bindPlayerInventory();
     }
 
     @Override
