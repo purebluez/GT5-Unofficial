@@ -14,6 +14,12 @@ import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 
+import com.cleanroommc.modularui.api.drawable.IKey;
+import com.cleanroommc.modularui.factory.PosGuiData;
+import com.cleanroommc.modularui.screen.ModularPanel;
+import com.cleanroommc.modularui.value.sync.LongSyncValue;
+import com.cleanroommc.modularui.value.sync.PanelSyncManager;
+import com.cleanroommc.modularui.value.sync.StringSyncValue;
 import com.gtnewhorizons.modularui.api.math.Alignment;
 import com.gtnewhorizons.modularui.api.math.Color;
 import com.gtnewhorizons.modularui.api.screen.ModularWindow;
@@ -30,6 +36,8 @@ import gregtech.api.interfaces.modularui.IAddGregtechLogo;
 import gregtech.api.interfaces.modularui.IAddUIWidgets;
 import gregtech.api.interfaces.tileentity.IGregTechTileEntity;
 import gregtech.api.metatileentity.MetaTileEntity;
+import gregtech.api.modularui2.GTGuiTextures;
+import gregtech.api.modularui2.GTGuis;
 import gregtech.api.util.GTUtility;
 import gregtech.common.WirelessComputationPacket;
 import mcp.mobius.waila.api.IWailaConfigHandler;
@@ -172,6 +180,38 @@ public class MTEHatchWirelessComputationInput extends MTEHatchDataInput
                 + GTUtility.formatNumbers(
                     accessor.getNBTData()
                         .getLong("requiredComputation")));
+    }
+
+    @Override
+    protected boolean useMui2() {
+        return true;
+    }
+
+    @Override
+    public ModularPanel buildUI(PosGuiData data, PanelSyncManager syncManager) {
+        LongSyncValue compSyncer = new LongSyncValue(() -> requiredComputation, val -> requiredComputation = val);
+        syncManager.syncValue("requiredComputation", compSyncer);
+        return GTGuis.mteTemplatePanelBuilder(this, data, syncManager)
+            .doesAddGregTechLogo(false)
+            .build()
+            .child(
+                IKey.lang("tt.wirelessInputData.config.text")
+                    .asWidget()
+                    .alignment(com.cleanroommc.modularui.utils.Alignment.Center)
+                    .pos(20, 12)
+                    .size(140, 14))
+            .child(
+                new com.cleanroommc.modularui.widgets.textfield.TextFieldWidget()
+                    // TODO alignment doesnt seem to work for some reason. get fixed
+                    .setTextAlignment(com.cleanroommc.modularui.utils.Alignment.Center)
+                    .setNumbers(1, Integer.MAX_VALUE)
+                    .value(new StringSyncValue(compSyncer::getStringValue, compSyncer::setStringValue))
+                    .size(70, 18)
+                    .pos(54, 36))
+            .child(
+                GTGuiTextures.PICTURE_TECTECH_LOGO_STANDARD.asWidget()
+                    .pos(151, 63))
+            .bindPlayerInventory();
     }
 
     @Override

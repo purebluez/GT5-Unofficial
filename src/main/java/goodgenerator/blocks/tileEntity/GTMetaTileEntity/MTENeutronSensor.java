@@ -260,6 +260,7 @@ public class MTENeutronSensor extends MTEHatch {
                     .overlay(true, GTGuiTextures.OVERLAY_BUTTON_REDSTONE_ON)
                     .tooltip(false, tooltip -> tooltip.add(INVERTED))
                     .tooltip(true, tooltip -> tooltip.add(NORMAL))
+                    .size(16, 16)
                     .pos(10, 8))
             .child(
                 IKey.dynamic(() -> inverted ? INVERTED.toString() : NORMAL.toString())

@@ -6,6 +6,7 @@ import com.cleanroommc.modularui.drawable.UITexture;
 
 import bartworks.MainMod;
 import gregtech.common.modularui2.util.SteamTextureRegisterer;
+import tectech.Reference;
 
 /**
  * Holds all the references to GUI textures used within GregTech.
@@ -410,6 +411,12 @@ public final class GTGuiTextures {
         .location(MainMod.MOD_ID, "GUI/picture/bw_logo_47x21")
         .fullImage()
         .name(GTTextureIds.PICTURE_BW_LOGO_STANDARD)
+        .build();
+    public static final UITexture PICTURE_TECTECH_LOGO_STANDARD = UITexture.builder()
+        .location(Reference.MODID, "gui/picture/tectech_logo")
+        .fullImage()
+        .canApplyTheme()
+        .name(GTTextureIds.PICTURE_TECTECH_LOGO_STANDARD)
         .build();
 
     public static final UITexture PICTURE_TRANSPARENT = UITexture.builder()
